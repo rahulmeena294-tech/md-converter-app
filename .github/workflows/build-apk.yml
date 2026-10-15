@@ -1,0 +1,46 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install Build Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install buildozer cython
+
+    # Note: Full python-to-apk cross compilation via Buildozer requires Android SDK/NDK 
+    # which can take 10-15 minutes on the first run.
+    - name: Initialize Buildozer Config
+      run: |
+        buildozer init || true
+        # Modify buildozer spec for non-interactive build
+        sed -i 's/#title = My Application/title = MD Converter/g' buildozer.spec
+        sed -i 's/#package.name = myapp/package.name = mdconverter/g' buildozer.spec
+        sed -i 's/#package.domain = org.test/package.domain = com.rahulmeena/g' buildozer.spec
+        sed -i 's/#requirements = python3,kivy/requirements = python3,kivy,pandas,openpyxl,python-docx/g' buildozer.spec
+
+    - name: Build APK with Buildozer
+      uses: ArtemSBulgakov/buildozer-action@v1
+      id: buildozer
+      with:
+        command: buildozer -v android release
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: md-converter-apk
+        path: bin/*.apk
