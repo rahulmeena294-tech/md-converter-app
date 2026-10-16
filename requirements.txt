@@ -1,4 +1,4 @@
-streamlit
+kivy
 pandas
 openpyxl
 python-docx
