@@ -150,7 +150,7 @@ class UniversalConverter:
         if output_format == "md":
             md_lines = [f"# PDF Document: {path.name}\n\n"]
             for item in pages_content:
-                md_lines.append(f"## Page {item['page']}\\n\\n")
+                md_lines.append(f"## Page {item['page']}\n\n")
                 if item["text"]:
                     md_lines.append(f"{item['text']}\n\n")
                 for t_idx, table in enumerate(item["tables"], start=1):
